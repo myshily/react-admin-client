@@ -68,3 +68,7 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `yarn build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+### 生产环境打包 npm run build
+### 本地测试运行需有服务器的包  serve build(安装本地服务包 npm install -g serve)
+### 实现组件的按需打包-下载依赖模块： yarn add react-app-rewired customize-cra babel-plugin-import
