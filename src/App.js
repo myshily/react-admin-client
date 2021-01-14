@@ -1,9 +1,25 @@
 import  React, {Component} from 'react'
+import {BrowserRouter,Route,Switch} from 'react-router-dom'
 
-/*应用的根组件*/
+import Login from './pages/login/login'
+import Admin from './pages/admin/admin'
+
+/*应用的根组件
+可以将BrowserRouter替换为HashRouter,使访问域名后带 # 号（http://localhost:3000/#/）
+* */
 
 export  default  class App extends Component{
+
+
+
     render() {
-        return <div>App</div>
+        return (
+            <BrowserRouter>
+                <Switch> {/*只匹配其中一个*/}
+                    <Route path="/login" component={Login}></Route>
+                    <Route path="/" component={Admin}></Route>
+                </Switch>
+            </BrowserRouter>
+        )
     }
 }
