@@ -91,7 +91,7 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 
 # day05
 
-##分页列表
+## 分页列表
 ##  1）.纯前台分页
 ##    请求获取数据：一次获取所有数据，翻页时不需要再发请求
 ##    请求接口：
