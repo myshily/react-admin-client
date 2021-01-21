@@ -1,6 +1,8 @@
 import React,{Component} from 'react'
 import { Card, Form,Input,Cascader,Upload,Button} from 'antd';
 import {ArrowLeftOutlined} from '@ant-design/icons';
+
+import PicturesWall from "./pictures-wall";
 import LinkButton from "../../components/link-button/link-button";
 import {reqCategorys} from "../../api";
 
@@ -28,13 +30,32 @@ const { TextArea } = Input
      optionLists,  //如服务器请求接口正常，需修改为 optionLists:[]
    }
   
-   initOptions=(categorys)=>{
+   initOptions=async (categorys)=>{
      //根据categorys生成options数组
      const optionLists=categorys.map(c=>({
        value: c._id,
        label: c.name,
        isLeaf: false, //不是叶子
      }))
+     
+     // 如果是一个二级分类商品的更新
+     const {isUpdate,product}=this
+     const {pCategoryId,categoryId}=product
+     if (isUpdate && pCategoryId!=='0'){
+       // 获取对应的二级分类列表
+       const subCategorys=await this.getCategorys(pCategoryId)
+       //生成二级下拉列表的options
+       const childOptions=subCategorys.map(c=>({
+         value: c._id,
+         label: c.name,
+         isLeaf: true,
+       }))
+       //找到当前商品对应的一级option对象
+       const targetOption=optionLists.find(option=>option.value===pCategoryId)
+       // 关联到对应的一级option上
+       targetOption.children=childOptions
+     }
+     
      //更新options状态
      this.setState({
        optionLists
@@ -129,7 +150,31 @@ const { TextArea } = Input
      this.getCategorys('0')
    }
   
+   componentWillMount() {
+     //取出携带的state
+     const product=this.props.location.state  // 如果是添加没值，否则有值
+     // 保存是否是更新的标识
+     this.isUpdate=!!product
+     // 保存商品（如果没有，保存是{}）
+     this.product=product || {}
+   }
+  
    render() {
+     
+     const {isUpdate,product}=this
+     const {pCategoryId,categoryId}=product
+  // 用来接收级联分类ID的数组
+     const categoryIds=[]
+     if (isUpdate) {
+       // 商品是一个一级分类的商品
+       if (pCategoryId==='0'){
+         categoryIds.push(categoryId)
+       }else{
+         // 商品是一个二级分类的商品
+         categoryIds.push(pCategoryId)
+         categoryIds.push(categoryId)
+       }
+     }
     
     // 进行表单验证，如果通过了，才发送请求
     const onFinish = (values) => {
@@ -146,12 +191,13 @@ const { TextArea } = Input
       }, // 右侧包裹的宽度
     };
     
+    //头部左侧标题
     const title=(
       <span>
-        <LinkButton>
+        <LinkButton onClick={()=>this.props.history.goBack()}>
           <ArrowLeftOutlined style={{fontSize:20}}/>
         </LinkButton>
-        <span>添加商品</span>
+        <span>{isUpdate ? '修改商品' : '添加商品'}</span>
       </span>
     )
     
@@ -167,7 +213,7 @@ const { TextArea } = Input
                 message: '必须输入商品名称',
               },
             ]}
-            initialValue=''
+            initialValue={product.name}
           >
             <Input placeholder='请输入商品名称'/>
           </Form.Item>
@@ -180,7 +226,7 @@ const { TextArea } = Input
                 message: '必须输入商品描述',
               },
             ]}
-            initialValue=''
+            initialValue={product.desc}
           >
             <TextArea placeholder="请输入商品描述" autoSize={{ minRows: 2, maxRows: 6 }} />
           </Form.Item>
@@ -194,19 +240,30 @@ const { TextArea } = Input
               },
               {validator:this.validatePrice}
             ]}
-            initialValue=''
+            initialValue={product.price}
           >
             <Input type='number' placeholder='请输入商品价格' addonAfter="元"/>
           </Form.Item>
-          <Form.Item label="商品分类">
+          <Form.Item
+            name="商品分类"
+            label="商品分类"
+            rules={[
+              {
+                required: true,
+                message: '必须指定商品分类',
+              },
+            ]}
+            initialValue={categoryIds}
+          >
             <Cascader
+              placeholder='请指定商品分类'
               options={this.state.optionLists} /*需要显示的列表数据数组*/
               loadData={this.loadData} /*当选择某个列表项，加载下一级列表的监听回调*/
               changeOnSelect
             />
           </Form.Item>
           <Form.Item label="商品图片">
-            <div>商品图片</div>
+            <PicturesWall/>
           </Form.Item>
           <Form.Item label="商品详情">
             <div>商品详情</div>
