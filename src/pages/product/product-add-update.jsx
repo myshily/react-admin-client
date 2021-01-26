@@ -278,3 +278,8 @@ const { TextArea } = Input
 }
 
 export default ProductAddUpdate
+
+/*
+1.子组件调用父组件的方法： 将父组件的方法以函数属性的形式传递给子组件，子组件就可以调用
+2.父组件调用子组件的方法：
+* */

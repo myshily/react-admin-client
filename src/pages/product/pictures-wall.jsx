@@ -1,5 +1,5 @@
 import React from 'react'
-import { Upload, Modal } from 'antd';
+import { Upload, Modal,message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 
 function getBase64(file) {
@@ -17,8 +17,8 @@ export default class PicturesWall extends React.Component {
     previewVisible: false, // 标识是否显示大图预览Modal
     previewImage: '', // 大图的url
     previewTitle: '',
-    fileList: [
-      {
+    fileList: [   //如果服务器请求接口正常，需删除内容，为空数组
+      /*{
         uid: '-1', // 每个file都有自己唯一的id
         name: 'image.png', // 图片文件名
         status: 'done',  // 图片状态：done-已上传，uploading：正在上传中，removed：已删除
@@ -36,9 +36,14 @@ export default class PicturesWall extends React.Component {
         name: 'image.png',
         status: 'uploading',
         url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-      },
+      },*/
     ],
   };
+  
+  /*获取所有已上传图片文件名的数组*/
+  getImgs=()=>{
+    return this.state.fileList.map(file=>file.name)
+  }
   
   /*隐藏Modal*/
   handleCancel = () => this.setState({ previewVisible: false });
@@ -59,7 +64,22 @@ export default class PicturesWall extends React.Component {
   /*file：当前操作的图片文件（上传/删除）
   fileList: 所有已上传图片文件对象的数组*/
   handleChange = ({ file,fileList }) => {
-    console.log('handleChange()',file.status,file)
+    console.log('handleChange()',file.status,fileList.length,file===fileList[fileList.length-1])
+    
+    //一旦上传成功，将当前上传的file的信息修正（name,url）
+    if (file.status==='done'){
+      const result=file.response // {status:0,data:{name:'xxx.jpg',url:'图片地址'}}
+      if(result.status===0){
+        message.success("上传图片成功！")
+        const {name,url}=result.data
+        file.name=name
+        file.url=url
+      }else {
+        message.error("上传图片失败")
+      }
+    }
+    
+    //在操作（上传/删除）过程中更新fileList状态
     this.setState({fileList})
   };
   
