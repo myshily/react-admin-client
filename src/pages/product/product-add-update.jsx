@@ -3,6 +3,7 @@ import { Card, Form,Input,Cascader,Upload,Button} from 'antd';
 import {ArrowLeftOutlined} from '@ant-design/icons';
 
 import PicturesWall from "./pictures-wall";
+import RichTextEditor from "./rich-text-editor";
 import LinkButton from "../../components/link-button/link-button";
 import {reqCategorys} from "../../api";
 
@@ -35,6 +36,7 @@ const { TextArea } = Input
      
      //创建用来保存ref标识的标签对象容器
      this.pw=React.createRef()
+     this.editor=React.createRef()
    }
   
    initOptions=async (categorys)=>{
@@ -188,7 +190,8 @@ const { TextArea } = Input
       console.log('Success:', values)
       
       const imgs=this.pw.current.getImgs()
-      console.log('imgs',imgs)
+      const detail=this.editor.current.getDetail()
+      console.log('imgs',imgs,detail)
     };
     
     //指定Item布局的配置对象
@@ -275,8 +278,9 @@ const { TextArea } = Input
           <Form.Item label="商品图片">
             <PicturesWall ref={this.pw} imgs={imgs}/>
           </Form.Item>
-          <Form.Item label="商品详情">
-            <div>商品详情</div>
+          <Form.Item label="商品详情" labelCol={{span: 4}}
+          wrapperCol={{span: 20}}>
+            <RichTextEditor ref={this.editor}/>
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">提交</Button>
