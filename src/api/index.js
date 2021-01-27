@@ -35,6 +35,8 @@ export const reqSearchProducts=({pageNum,pageSize,searchName,searchType})=>ajax(
 //搜索商品分页列表(根据商品描述)
 //export const reqSearchProducts=()=>ajax(BASE+'/manage/product/search',{pageNum,pageSize,productDesc:searchName})
 
+export const reqDeleteImg=(name)=>ajax(BASE+'/manage/img/delete',{name},'POST')
+
 /*json请求的接口函数*/
 export const reqWeather=()=>{
   return  new Promise((resolve,reject)=>{
