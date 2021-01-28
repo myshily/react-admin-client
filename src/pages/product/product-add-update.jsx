@@ -1,11 +1,11 @@
 import React,{Component} from 'react'
-import { Card, Form,Input,Cascader,Upload,Button} from 'antd';
+import {Card, Form, Input, Cascader, Upload, Button, message} from 'antd';
 import {ArrowLeftOutlined} from '@ant-design/icons';
 
 import PicturesWall from "./pictures-wall";
 import RichTextEditor from "./rich-text-editor";
 import LinkButton from "../../components/link-button/link-button";
-import {reqCategorys} from "../../api";
+import {reqCategorys,reqAddOrUpdateProduct} from "../../api";
 
 //如服务器请求接口正常，需要删除数组
 const optionLists = [
@@ -148,7 +148,7 @@ const { TextArea } = Input
    
    /*submit=()=>{
      // 进行表单验证，如果通过了，才发送请求
-     this.props.form.validateFields((err,values)=>{
+     this.props.form.validateFields(async (err,values)=>{
        if (!err){
          alert('发送ajax请求',values)
        }
@@ -171,7 +171,7 @@ const { TextArea } = Input
    render() {
      
      const {isUpdate,product}=this
-     const {pCategoryId,categoryId,imgs}=product
+     const {pCategoryId,categoryId,imgs,detail}=product
   // 用来接收级联分类ID的数组
      const categoryIds=[]
      if (isUpdate) {
@@ -186,11 +186,40 @@ const { TextArea } = Input
      }
     
     // 进行表单验证，如果通过了，才发送请求
-    const onFinish = (values) => {
+    const onFinish = async (values) => {
       console.log('Success:', values)
       
+      //1.收集数据,并封装成product对象
+      const {name,desc,price,categoryIds}=values
+      let pCategoryId,categoryId
+      if (categoryIds.length===1){
+        pCategoryId='0'
+        categoryId=categoryIds[0]
+      }else {
+        pCategoryId=categoryIds[0]
+        categoryId=categoryIds[1]
+      }
       const imgs=this.pw.current.getImgs()
       const detail=this.editor.current.getDetail()
+      
+      const product={name,desc,price,imgs,detail,pCategoryId,categoryId}
+      
+      // 如果是更新，需要添加_id
+      if (this.isUpdate){
+        product._id=this.product._id
+      }
+      
+      //2.调用接口请求函数去添加/更新
+      const result=await reqAddOrUpdateProduct(product)
+      
+      //3.根据结果提示
+      if (result.status===0){
+        message.success(`${this.isUpdate ? '更新' : '添加'}商品成功！`)
+        this.props.history.goBack()
+      }else {
+        message.error(`${this.isUpdate ? '更新' : '添加'}商品失败！`)
+      }
+      
       console.log('imgs',imgs,detail)
     };
     
@@ -280,7 +309,7 @@ const { TextArea } = Input
           </Form.Item>
           <Form.Item label="商品详情" labelCol={{span: 4}}
           wrapperCol={{span: 20}}>
-            <RichTextEditor ref={this.editor}/>
+            <RichTextEditor ref={this.editor} detail={detail}/>
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">提交</Button>
