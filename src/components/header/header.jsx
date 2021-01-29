@@ -40,7 +40,7 @@ import storageUtils from "../../utils/storageUtils";
         title=item.title
       }else if (item.children){
         //在所有子item中查找匹配的
-        const cItem=item.children.find(cItem=>cItem.key===path)
+        const cItem=item.children.find(cItem=>path.indexOf(cItem.key)===0)
         //如果有值才说明有匹配的
         if(cItem){
           //取出它的title

@@ -334,7 +334,8 @@ export default class Category extends Component{
       <Card title={title} extra={extra}>
         {/*如果为服务器传值，{dataSource}需修改为{parentId==='0'?categorys : subCategorys} {false}需改为{loading}*/}
         <Table
-          bordered rowKey='key'
+          bordered
+          rowKey='key'
           dataSource={dataSource}
           columns={this.columns}
           loading={false}
