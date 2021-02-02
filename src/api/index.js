@@ -45,6 +45,8 @@ export const reqAddOrUpdateProduct=(product)=>ajax(BASE+'/manage/product/'+(prod
 
 // 获取所有角色的列表
 export const reqRoles=()=>ajax(BASE+'/manage/role/list')
+// 获取所有角色的列表
+export const reqAddRole=(roleName)=>ajax(BASE+'/manage/role/add',{roleName},'POST')
 
 /*json请求的接口函数*/
 export const reqWeather=()=>{
